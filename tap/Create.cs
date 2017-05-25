@@ -83,7 +83,7 @@ namespace tap
             CompressPatchFile(patchName, patchRoot);
             RemovePatchDirectory(patchRoot);
             string result = Publish(patchName);
-            System.Windows.MessageBox.Show(string.Format("Patch Created at {0}", result));
+            System.Windows.MessageBox.Show(string.Format("Patch Created at {0}", result), "The sweet smell of success", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
         }
 
         private void CompressPatchFile(string patchName, string patchRoot)

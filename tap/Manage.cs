@@ -70,7 +70,7 @@ namespace tap
 
                 if (Directory.Exists(Path.Combine(AppliedPatchesDir, patchName)) && File.Exists(patchRecordFile))
                 {
-                    System.Windows.MessageBox.Show(string.Format("Patch {0} is already applied, please remove it first", patchName));
+                    System.Windows.MessageBox.Show(string.Format("Patch {0} is already applied, please remove it first", patchName), "The bitter taste of disappointment", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
                     return;
                 }
 
@@ -87,7 +87,7 @@ namespace tap
                     // by this point we have a fully extracted patch file ready for deployment
                     if(DeployPatch(patchRoot, targetDir))
                     {
-                        MessageBox.Show(string.Format("Patch {0} Deployed", patchName));
+                        MessageBox.Show(string.Format("Patch {0} Deployed", patchName), "The sweet smell of success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         Refresh();
                     }
                     else
@@ -105,7 +105,7 @@ namespace tap
                 string patchName = GetAppliedPatchName();
                 string patchRoot = Path.Combine(AppliedPatchesDir, patchName);
                 Helpers.ForceDeleteDirectory(patchRoot);
-                MessageBox.Show(string.Format("Patch {0} Deleted", patchName));
+                MessageBox.Show(string.Format("Patch {0} Deleted", patchName), "The sweet smell of success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Refresh();
             }
         }
@@ -129,12 +129,12 @@ namespace tap
                         }
                         message = message + overLaps[idx];
                     }
-                    MessageBox.Show(message);
+                    MessageBox.Show(message, "I told you this when you put it on!", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                     return;
                 }
                 RevertPatch(patchRoot, patchMap);
                 Helpers.ForceDeleteDirectory(patchRoot);
-                MessageBox.Show(string.Format("Patch {0} Reverted", patchName));
+                MessageBox.Show(string.Format("Patch {0} Reverted", patchName), "The sweet smell of success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Refresh();
             }
         }
@@ -275,7 +275,7 @@ namespace tap
                     }
                     message = message + overLaps[idx];
                 }
-                if (DialogResult.Cancel == MessageBox.Show(message, "Overlapping patches", MessageBoxButtons.OKCancel))
+                if (DialogResult.Cancel == MessageBox.Show(message, "Overlapping patches", MessageBoxButtons.OKCancel, MessageBoxIcon.Information))
                 {
                     return false;
                 }
@@ -342,12 +342,12 @@ namespace tap
             string[] files = Directory.GetFiles(targetDir, patchFile, SearchOption.AllDirectories);
             if(files.Length == 0)
             {
-                MessageBox.Show(string.Format("Cannot find existing file {0}, please select target folder", patchFile));
+                MessageBox.Show(string.Format("Cannot find existing file {0}, please select target folder", patchFile), "File doesn't yet exist", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 target = SelectTargetDirectory();
             }
             else if (files.Length > 1)
             {
-                MessageBox.Show(string.Format("Found more than one occurence of file {0}, please select exact target folder", patchFile));
+                MessageBox.Show(string.Format("Found more than one occurence of file {0}, please select exact target folder", patchFile), "I found a few of these", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 target = SelectTargetDirectory();
             }
             else
