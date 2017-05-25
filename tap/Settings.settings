@@ -8,5 +8,11 @@
     <Setting Name="DefaultFileExtension" Type="System.String" Scope="User">
       <Value Profile="(Default)">.zip</Value>
     </Setting>
+    <Setting Name="FileDialogInitialLocation" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="FolderDialogInitialLocation" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -96,7 +96,13 @@ namespace tap
 
         private void lstFiles_Drop(object sender, DragEventArgs e)
         {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                // Note that you can have more than one file.
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
 
+                Create.Add(files);
+            }
         }
 
         private string GetPatchName()
@@ -119,6 +125,14 @@ namespace tap
         {
             Settings.Default.PatchRepository = txtPatchRepository.Text;
             Settings.Default.Save();
+        }
+
+        private void lstFiles_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                e.Effects = DragDropEffects.All;
+            else
+                e.Effects = DragDropEffects.None;
         }
     }
 }

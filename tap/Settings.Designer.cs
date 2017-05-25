@@ -46,5 +46,29 @@ namespace tap {
                 this["DefaultFileExtension"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string FileDialogInitialLocation {
+            get {
+                return ((string)(this["FileDialogInitialLocation"]));
+            }
+            set {
+                this["FileDialogInitialLocation"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string FolderDialogInitialLocation {
+            get {
+                return ((string)(this["FolderDialogInitialLocation"]));
+            }
+            set {
+                this["FolderDialogInitialLocation"] = value;
+            }
+        }
     }
 }

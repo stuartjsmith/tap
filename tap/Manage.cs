@@ -12,7 +12,6 @@ namespace tap
         private string AppliedPatchesDir = "AppliedPatches";
         private System.Windows.Controls.ListBox _lstAvailable;
         private System.Windows.Controls.ListBox _lstApplied;
-        private string _fdPath;
 
         public Manage(System.Windows.Controls.ListBox lstAvailable, System.Windows.Controls.ListBox lstApplied)
         {
@@ -151,13 +150,14 @@ namespace tap
         {
             FolderBrowserDialog dialog = new FolderBrowserDialog();
             dialog.Description = "Select target folder";
-            if (_fdPath != null && Directory.Exists(_fdPath))
+            if (Settings.Default.FolderDialogInitialLocation != null && Directory.Exists(Settings.Default.FolderDialogInitialLocation))
             {
-                dialog.SelectedPath = _fdPath;
+                dialog.SelectedPath = Settings.Default.FolderDialogInitialLocation;
             }
             if (dialog.ShowDialog() == DialogResult.OK)
             {
-                _fdPath = dialog.SelectedPath;
+                Settings.Default.FolderDialogInitialLocation = dialog.SelectedPath;
+                Settings.Default.Save();
                 return dialog.SelectedPath;
             }
             return null;

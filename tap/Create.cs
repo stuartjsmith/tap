@@ -8,7 +8,6 @@ namespace tap
 {
     class Create
     {
-        private string _fdPath;
         private string CreatedPatchesDir = "CreatedPatches";
         private ListBox _lstFiles;
         public Create(ListBox lstFiles)
@@ -25,28 +24,33 @@ namespace tap
             _lstFiles.Items.Clear();
         }
 
-        //private void lstFiles_Drop(object sender, DragEventArgs e)
-        //{
-        //    // object o = e.Data.GetData()
-        //}
-
         public void Add()
         {
             Microsoft.Win32.OpenFileDialog fd = new Microsoft.Win32.OpenFileDialog();
             fd.Multiselect = true;
-            if (string.IsNullOrEmpty(_fdPath) == false)
+            if (string.IsNullOrEmpty(Settings.Default.FileDialogInitialLocation) == false)
             {
-                fd.InitialDirectory = _fdPath;
+                fd.InitialDirectory = Settings.Default.FileDialogInitialLocation;
             }
             if (fd.ShowDialog() == true)
             {
-                foreach (string file in fd.FileNames)
+                Add(fd.FileNames);
+
+                if (fd.FileNames.Length > 0)
                 {
-                    if (_lstFiles.Items.Contains(file) == false)
-                    {
-                        _lstFiles.Items.Add(file);
-                        _fdPath = Path.GetDirectoryName(file);
-                    }
+                    Settings.Default.FileDialogInitialLocation = Path.GetDirectoryName(fd.FileNames[0]);
+                    Settings.Default.Save();
+                }
+            }
+        }
+
+        public void Add(string[] files)
+        {
+            foreach (string file in files)
+            {
+                if (_lstFiles.Items.Contains(file) == false)
+                {
+                    _lstFiles.Items.Add(file);
                 }
             }
         }
