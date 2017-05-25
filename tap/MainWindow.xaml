@@ -11,12 +11,13 @@
             <TabItem Header="Manage" Loaded="TabItem_Loaded">
                 <Grid Background="White">
                     <ListBox x:Name="lstAvailable" HorizontalAlignment="Left" Height="332" Margin="10,26,0,0" VerticalAlignment="Top" Width="210"/>
-                    <Label x:Name="lblAvailable" Content="Available Patches:" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                    <Button x:Name="btnApply" Content="Apply" HorizontalAlignment="Left" Margin="234,26,0,0" VerticalAlignment="Top" Width="75" Click="btnApply_Click"/>
-                    <Button x:Name="btnRefresh" Content="Refresh" HorizontalAlignment="Left" Margin="234,80,0,0" VerticalAlignment="Top" Width="75" Click="btnRefresh_Click"/>
+                    <Label x:Name="lblAvailable" Content="Available Patches:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,0,0,0"/>
+                    <Button x:Name="btnApply" Content="Apply &gt;&gt;" HorizontalAlignment="Left" Margin="234,26,0,0" VerticalAlignment="Top" Width="75" Click="btnApply_Click" ToolTip="Apply the selected available patch"/>
+                    <Button x:Name="btnRefresh" Content="Refresh" HorizontalAlignment="Left" Margin="234,309,0,0" VerticalAlignment="Top" Width="75" Click="btnRefresh_Click" ToolTip="Refresh these lists"/>
                     <ListBox x:Name="lstApplied" HorizontalAlignment="Left" Height="332" Margin="325,26,0,0" VerticalAlignment="Top" Width="210"/>
-                    <Label x:Name="lblApplied" Content="Applied Patches:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="337,0,0,0"/>
-                    <Button x:Name="btnRevert" Content="Revert" HorizontalAlignment="Left" Margin="234,53,0,0" VerticalAlignment="Top" Width="75" Click="btnRevert_Click"/>
+                    <Label x:Name="lblApplied" Content="Applied Patches:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="325,0,0,0"/>
+                    <Button x:Name="btnRevert" Content="Revert" HorizontalAlignment="Left" Margin="234,53,0,0" VerticalAlignment="Top" Width="75" Click="btnRevert_Click" ToolTip="Revert the selected applied patch and rool back to the original files"/>
+                    <Button x:Name="btnDelete" Content="Delete" HorizontalAlignment="Left" Margin="234,336,0,0" VerticalAlignment="Top" Width="75" Click="btnDelete_Click" ToolTip="Delete the record of the selected applied patch, this option will not restore the original files"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Create">

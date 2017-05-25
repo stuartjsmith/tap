@@ -134,5 +134,10 @@ namespace tap
             else
                 e.Effects = DragDropEffects.None;
         }
+
+        private void btnDelete_Click(object sender, RoutedEventArgs e)
+        {
+            Manage.Delete();
+        }
     }
 }

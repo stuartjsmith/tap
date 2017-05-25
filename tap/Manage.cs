@@ -98,6 +98,18 @@ namespace tap
             }
         }
 
+        internal void Delete()
+        {
+            if (_lstApplied.SelectedItem != null)
+            {
+                string patchName = GetAppliedPatchName();
+                string patchRoot = Path.Combine(AppliedPatchesDir, patchName);
+                Helpers.ForceDeleteDirectory(patchRoot);
+                MessageBox.Show(string.Format("Patch {0} Deleted", patchName));
+                Refresh();
+            }
+        }
+
         internal void RevertPatch()
         {
             if (_lstApplied.SelectedItem != null)
