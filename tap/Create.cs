@@ -96,7 +96,7 @@ namespace tap
             foreach (string fileToZip in lstFiles.Items)
             {
                 File.Copy(fileToZip, Path.Combine(Path.Combine(patchRoot, "patch"), Path.GetFileName(fileToZip)));
-                File.AppendAllText(Path.Combine(patchRoot, "contents.txt"), Path.GetFileName(fileToZip) + Environment.NewLine);
+                File.AppendAllText(Path.Combine(patchRoot, "contents.txt"), fileToZip + Environment.NewLine);
             }
         }
 

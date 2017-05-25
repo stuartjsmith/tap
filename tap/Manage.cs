@@ -105,11 +105,61 @@ namespace tap
                 string patchName = GetAppliedPatchName();
                 string patchRoot = Path.Combine(AppliedPatchesDir, patchName);
                 Dictionary<string, string> patchMap = DeserializePatchMap(patchRoot);
+                List<string> overLaps = GetOverlappingPatches(patchRoot, patchMap, false);
+                if(overLaps.Count > 0)
+                {
+                    string message = "Patches containing the same files have been found, you must remove the patches in this order before removing this one: ";
+                    for(int idx=0; idx < overLaps.Count; idx++)
+                    {
+                        if(idx!=0)
+                        {
+                            message = message + ", ";
+                        }
+                        message = message + overLaps[idx];
+                    }
+                    MessageBox.Show(message);
+                    return;
+                }
                 RevertPatch(patchRoot, patchMap);
                 Helpers.ForceDeleteDirectory(patchRoot);
                 MessageBox.Show(string.Format("Patch {0} Reverted", patchName));
                 Refresh();
             }
+        }
+
+        private List<string> GetOverlappingPatches(string patchRoot, Dictionary<string, string> patchMap, bool applyPatch)
+        {
+            bool gotPatchStart = false;
+            List<string> overlappingPatches = new List<string>();
+            // this method needs to make sure that no other previously applied patches overlap in terms of file content with the one we are trying to remove
+            foreach(string appliedPatch in _lstApplied.Items)
+            {
+                string otherPatchRoot = Path.Combine(AppliedPatchesDir, appliedPatch);
+                if (!applyPatch)
+                {
+                    if (gotPatchStart == false && !patchRoot.Equals(otherPatchRoot))
+                    {
+                        // we don't care about patches applied prioer to this one
+                        continue;
+                    }
+                    if (patchRoot.Equals(otherPatchRoot))
+                    {
+                        gotPatchStart = true;
+                        continue;
+                    }
+                }
+                Dictionary<string, string> otherPatchMap = DeserializePatchMap(otherPatchRoot);
+                foreach(string target in otherPatchMap.Keys)
+                {
+                    if(patchMap.ContainsKey(target))
+                    {
+                        overlappingPatches.Insert(0, appliedPatch);
+                        break;
+                    }
+                }
+            }
+
+            return overlappingPatches;
         }
 
         private void RevertPatch(string patchRoot, Dictionary<string, string> patchMap)
@@ -172,6 +222,23 @@ namespace tap
                 string target = FindPatchFileInDir(Path.GetFileName(patchFile), targetDir);
                 if (target == null) return false;
                 patchMap.Add(Path.GetFileName(patchFile), target);
+            }
+            List<string> overLaps = GetOverlappingPatches(patchRoot, patchMap, true);
+            if(overLaps.Count > 0)
+            {
+                string message = "The following patches contain some of the same files, this is ok, but be aware that these patches will be overwritten by this one. When you remove the patches, they must be removed in the correct order to ensure integrity: ";
+                for (int idx = 0; idx < overLaps.Count; idx++)
+                {
+                    if (idx != 0)
+                    {
+                        message = message + ", ";
+                    }
+                    message = message + overLaps[idx];
+                }
+                if (DialogResult.Cancel == MessageBox.Show(message, "Overlapping patches", MessageBoxButtons.OKCancel))
+                {
+                    return false;
+                }
             }
             TakeOriginalCopies(patchRoot, patchMap);
             DeployReplacementFiles(patchRoot, patchMap);
