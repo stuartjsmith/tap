@@ -161,17 +161,45 @@ namespace tap
                     }
                 }
                 Dictionary<string, string> otherPatchMap = DeserializePatchMap(otherPatchRoot);
-                foreach(string target in otherPatchMap.Keys)
+                if(DoPatchMapsContainSameTargets(patchMap, otherPatchMap))
                 {
-                    if(patchMap.ContainsKey(target))
-                    {
-                        overlappingPatches.Insert(0, appliedPatch);
-                        break;
-                    }
+                    overlappingPatches.Insert(0, appliedPatch);
+                    break;
                 }
             }
 
             return overlappingPatches;
+        }
+
+        private bool DoPatchMapsContainSameTargets(Dictionary<string, string> patchMap1, Dictionary<string, string> patchMap2)
+        {
+            Dictionary<string, string> patchMap1_qualified = GetQualifiedPatchMap(patchMap1);
+            Dictionary<string, string> patchMap2_qualified = GetQualifiedPatchMap(patchMap2);
+
+            foreach (string target in patchMap1_qualified.Values)
+            {
+                if(patchMap2_qualified.ContainsValue(target))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private Dictionary<string, string> GetQualifiedPatchMap(Dictionary<string, string> patchMap)
+        {
+            Dictionary<string, string> qualifiedPatchMap = new Dictionary<string, string>();
+            foreach(KeyValuePair<string, string> patchItem in patchMap)
+            {
+                string key = patchItem.Key;
+                string value = patchItem.Value;
+                if(Helpers.IsDirectory(value))
+                {
+                    value = Path.Combine(value, key);
+                }
+                qualifiedPatchMap.Add(key, value);
+            }
+            return qualifiedPatchMap;
         }
 
         private void RevertPatch(string patchRoot, Dictionary<string, string> patchMap)
@@ -182,7 +210,7 @@ namespace tap
                 string target = patchItem.Value;
                 if (Helpers.IsDirectory(target))
                 {
-                    File.Delete(target);
+                    File.Delete(Path.Combine(target, patchItem.Key));
                 }
                 else
                 {
