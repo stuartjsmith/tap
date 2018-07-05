@@ -28,6 +28,7 @@ namespace tap
         {
             _lstAvailable.Items.Clear();
             // load patch names from known network location
+            if (string.IsNullOrEmpty(Settings.Default.PatchRepository)) return;
             List<string> files = Directory.EnumerateFiles(Settings.Default.PatchRepository).ToList();
             foreach (string available in files)
             {
@@ -132,9 +133,12 @@ namespace tap
                     MessageBox.Show(message, "I told you this when you put it on!", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                     return;
                 }
-                RevertPatch(patchRoot, patchMap);
-                Helpers.ForceDeleteDirectory(patchRoot);
-                MessageBox.Show(string.Format("Patch {0} Reverted", patchName), "The sweet smell of success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                bool success = RevertPatch(patchRoot, patchMap);
+                if (success)
+                {
+                    Helpers.ForceDeleteDirectory(patchRoot);
+                    MessageBox.Show(string.Format("Patch {0} Reverted", patchName), "The sweet smell of success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
                 Refresh();
             }
         }
@@ -202,9 +206,10 @@ namespace tap
             return qualifiedPatchMap;
         }
 
-        private void RevertPatch(string patchRoot, Dictionary<string, string> patchMap)
+        private bool RevertPatch(string patchRoot, Dictionary<string, string> patchMap, bool showErrors = true)
         {
-            foreach(KeyValuePair<string, string> patchItem in patchMap)
+            bool success = true;
+            foreach (KeyValuePair<string, string> patchItem in patchMap)
             {
                 string source = Path.Combine(patchRoot, "original", patchItem.Key);
                 string target = patchItem.Value;
@@ -214,9 +219,21 @@ namespace tap
                 }
                 else
                 {
-                    File.Copy(source, target, true);
+                    try
+                    {
+                        File.Copy(source, target, true);
+                    }
+                    catch (IOException e)
+                    {
+                        if (showErrors)
+                        {
+                            MessageBox.Show("Unable to revet patch - " + e.Message);
+                        }
+                        success = false;
+                    }
                 }
             }
+            return success;
         }
 
         private void RemoveAppliedPatchFiles(Dictionary<string, string> patchMap)
@@ -281,9 +298,10 @@ namespace tap
                 }
             }
             TakeOriginalCopies(patchRoot, patchMap);
-            DeployReplacementFiles(patchRoot, patchMap);
+            bool success = DeployReplacementFiles(patchRoot, patchMap);
+            if (success == false) RevertPatch(patchRoot, patchMap, false);
             SerializePatchMap(patchRoot, patchMap);
-            return true;
+            return success;
         }
 
         private void SerializePatchMap(string patchRoot, Dictionary<string, string> patchMap)
@@ -309,9 +327,10 @@ namespace tap
             return patchMap;
         }
 
-        private void DeployReplacementFiles(string patchRoot, Dictionary<string, string> patchMap)
+        private bool DeployReplacementFiles(string patchRoot, Dictionary<string, string> patchMap)
         {
-            foreach(KeyValuePair<string, string> patchItem in patchMap)
+            bool result = true;
+            foreach (KeyValuePair<string, string> patchItem in patchMap)
             {
                 string source = Path.Combine(patchRoot, "patch", patchItem.Key);
                 string target = patchItem.Value;
@@ -319,8 +338,17 @@ namespace tap
                 {
                     target = Path.Combine(target, patchItem.Key);
                 }
-                File.Copy(source, target, true);
+                try
+                {
+                    File.Copy(source, target, true);
+                }
+                catch(IOException e)
+                {
+                    MessageBox.Show("Unable to deploy patch - " + e.Message);
+                    result = false;
+                }
             }
+            return result;
         }
 
         private void TakeOriginalCopies(string patchRoot, Dictionary<string, string> patchMap)
