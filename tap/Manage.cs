@@ -215,7 +215,18 @@ namespace tap
                 string target = patchItem.Value;
                 if (Helpers.IsDirectory(target))
                 {
-                    File.Delete(Path.Combine(target, patchItem.Key));
+                    try
+                    {
+                        File.Delete(Path.Combine(target, patchItem.Key));
+                    }
+                    catch(Exception e)
+                    {
+                        if (showErrors)
+                        {
+                            MessageBox.Show("Unable to revert patch - " + e.Message);
+                        }
+                        success = false;
+                    }
                 }
                 else
                 {
@@ -227,7 +238,7 @@ namespace tap
                     {
                         if (showErrors)
                         {
-                            MessageBox.Show("Unable to revet patch - " + e.Message);
+                            MessageBox.Show("Unable to revert patch - " + e.Message);
                         }
                         success = false;
                     }
