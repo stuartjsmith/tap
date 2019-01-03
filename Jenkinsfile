@@ -3,14 +3,14 @@ import jenkins.model.Jenkins
 pipeline {
 	agent any
     stages {
-	    stage('Build') {
+	    stage('Build') {archiveArtifacts 
 		    steps {
                 bat "\"${tool 'msbuild12'}\" tap.sln /p:Configuration=Release /p:Platform=\"Any CPU\" /p:BuildNumber=${env.BUILD_NUMBER}"
             }
 	    }
 	    stage('Archive') {
 		    steps {
-                archive 'bin/Release/**'
+                archiveArtifacts 'tap/bin/Release/**'
             }
 	    }
 	    stage('Deploy') {
