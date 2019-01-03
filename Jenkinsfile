@@ -5,7 +5,7 @@ pipeline {
     stages {
 	    stage('Build') {
 		    steps {
-                bat "\"${tool 'msbuild12'}\" tap.sln /p:Configuration=Release /p:Platform=x64 /p:BuildNumber=${env.BUILD_NUMBER}"
+                bat "\"${tool 'msbuild12'}\" tap.sln /p:Configuration=Release /p:Platform=AnyCPU /p:BuildNumber=${env.BUILD_NUMBER}"
             }
 	    }
 	    stage('Archive') {
