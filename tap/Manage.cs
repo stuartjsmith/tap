@@ -403,12 +403,8 @@ namespace tap
             string[] files = Directory.GetFiles(targetDir, patchFile, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
             if(files.Length == 0)
             {
-                MessageBox.Show(string.Format("Cannot find existing file {0}, please select target folder", patchFile), "File doesn't yet exist", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(string.Format("Cannot find existing file {0}. Please confirm target folder that the new file should be added to", patchFile), "File doesn't yet exist", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 target = SelectTargetDirectory();
-                if (target != null)
-                {
-                    target = FindPatchFileInDir(patchFile, target, true);
-                }
             }
             else if (files.Length > 1)
             {
