@@ -10,7 +10,7 @@ pipeline {
 	    }
 	    stage('Archive') {
 		    steps {
-                archiveArtifacts artifacts: 'tap/bin/Release/**'
+                archiveArtifacts(artifacts: 'tap/bin/Release/**')
             }
 	    }
 	    stage('Deploy') {
