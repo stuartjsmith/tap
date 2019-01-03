@@ -177,6 +177,11 @@ namespace tap
 
         private bool IsPatchFileOutOfDate(string patchFile, string targetFile)
         {
+            if (Helpers.IsDirectory(patchFile) || Helpers.IsDirectory(targetFile))
+            {
+                return false;
+            }
+
             FileInfo patch = new FileInfo(patchFile);
             FileInfo target = new FileInfo(targetFile);
 
@@ -397,6 +402,13 @@ namespace tap
             }
         }
 
+        /// <summary>
+        /// Finds the path of a file in the target directory with the same name as the patch file
+        /// </summary>
+        /// <param name="patchFile">The name of the file to find</param>
+        /// <param name="targetDir">The target directory to search</param>
+        /// <param name="recursive">Whether to recurse into sub-directories</param>
+        /// <returns>If a single file is found, then returns the file's path. If no files are found, then returns the chosen directory path.</returns>
         private string FindPatchFileInDir(string patchFile, string targetDir, bool recursive)
         {
             string target;
