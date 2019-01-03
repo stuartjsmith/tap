@@ -175,6 +175,14 @@ namespace tap
             return overlappingPatches;
         }
 
+        private bool IsPatchFileOutOfDate(string patchFile, string targetFile)
+        {
+            FileInfo patch = new FileInfo(patchFile);
+            FileInfo target = new FileInfo(targetFile);
+
+            return patch.LastWriteTime < target.LastWriteTime;
+        }
+
         private bool DoPatchMapsContainSameTargets(Dictionary<string, string> patchMap1, Dictionary<string, string> patchMap2)
         {
             Dictionary<string, string> patchMap1_qualified = GetQualifiedPatchMap(patchMap1);
@@ -285,12 +293,26 @@ namespace tap
         {
             Dictionary<string, string> patchMap = new Dictionary<string, string>();
             List<string> files = Directory.EnumerateFiles(Path.Combine(patchRoot, "patch")).ToList();
+            bool outOfDate = false;
             foreach (string patchFile in files)
             {
-                string target = FindPatchFileInDir(Path.GetFileName(patchFile), targetDir);
+                string target = FindPatchFileInDir(Path.GetFileName(patchFile), targetDir, true);
                 if (target == null) return false;
+                outOfDate |= IsPatchFileOutOfDate(patchFile, target);
                 patchMap.Add(Path.GetFileName(patchFile), target);
             }
+
+            if (outOfDate)
+            {
+                string message =
+                    "Some of the files in the patch are older than the files in the target directory. This could mean that the patch is out-of-date or the wrong target directory has been selected.";
+
+                if (DialogResult.Cancel == MessageBox.Show(message, @"Out with the new, in with the old", MessageBoxButtons.OKCancel, MessageBoxIcon.Information))
+                {
+                    return false;
+                }
+            }
+
             List<string> overLaps = GetOverlappingPatches(patchRoot, patchMap, true);
             if(overLaps.Count > 0)
             {
@@ -375,19 +397,27 @@ namespace tap
             }
         }
 
-        private string FindPatchFileInDir(string patchFile, string targetDir)
+        private string FindPatchFileInDir(string patchFile, string targetDir, bool recursive)
         {
             string target;
-            string[] files = Directory.GetFiles(targetDir, patchFile, SearchOption.AllDirectories);
+            string[] files = Directory.GetFiles(targetDir, patchFile, recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
             if(files.Length == 0)
             {
                 MessageBox.Show(string.Format("Cannot find existing file {0}, please select target folder", patchFile), "File doesn't yet exist", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 target = SelectTargetDirectory();
+                if (target != null)
+                {
+                    target = FindPatchFileInDir(patchFile, target, true);
+                }
             }
             else if (files.Length > 1)
             {
                 MessageBox.Show(string.Format("Found more than one occurence of file {0}, please select exact target folder", patchFile), "I found a few of these", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                target = SelectTargetDirectory();
+                target = SelectTargetDirectory(); 
+                if (target != null)
+                {
+                    target = FindPatchFileInDir(patchFile, target, false);
+                }
             }
             else
             {
